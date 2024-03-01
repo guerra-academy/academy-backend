@@ -3,15 +3,6 @@ import ballerina/os;
 import ballerinax/postgresql;
 import ballerinax/postgresql.driver as _;
 
-http:JwtValidatorConfig config = {
-   issuer: "https://api.asgardeo.io/t/mycomp/oauth2/token",
-   audience: "zW8yXa5L9k0napib5nEeFchmCLAa",
-   signatureConfig: {
-       jwksConfig: {
-           url: "https://api.asgardeo.io/t/mycomp/oauth2/jwks"
-       }
-   }
-};
 type Course record {|
     int course_id;
     string title;
@@ -37,7 +28,17 @@ service /curso on new http:Listener(9090) {
     resource function post .(Course course) returns Course|error {
         _ = check self.db->execute(`
             INSERT INTO course_data (course_id, title, rating, num_reviews, num_students, hours, discount_url, image_url)
-            VALUES (${course.course_id}, ${course.title}, ${course.rating}, ${course.num_reviews}, ${course.num_students}, ${course.hours}, ${course.discount_url}, ${course.image_url});`);
+            VALUES (${course.course_id}, ${course.title}, ${course.rating}, ${course.num_reviews}, ${course.num_students}, ${course.hours}, ${course.discount_url}, ${course.image_url})
+            ON CONFLICT (course_id)
+            DO UPDATE SET
+            title = EXCLUDED.title,
+            rating = EXCLUDED.rating,
+            num_reviews = EXCLUDED.num_reviews,
+            num_students = EXCLUDED.num_students,
+            hours = EXCLUDED.hours,
+            discount_url = EXCLUDED.discount_url,
+            image_url = EXCLUDED.image_url;
+        `);
         return course;
     }
 }
