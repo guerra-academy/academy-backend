@@ -31,7 +31,7 @@ int dbPort = 5432;
 service /curso on new http:Listener(9090) {
     private final postgresql:Client db;
     function init() returns error? {
-        self.db = check new (host = dbHost, username = dbUser, password = dbPassword, database = dbName, port = dbPort, connectionPool = {maxOpenConnections: 2});
+        self.db = check new (host = dbHost, username = dbUser, password = dbPassword, database = dbName, port = dbPort, connectionPool = {maxOpenConnections: 1});
     }
 
     resource function post .(Course course) returns Course|error {
