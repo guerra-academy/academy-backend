@@ -48,6 +48,7 @@ func FetchAccessToken() (string, error) {
 
 	req, err := http.NewRequest("POST", apiUrl, data)
 	if err != nil {
+		println(err)
 		log.Fatal(err)
 	}
 
@@ -56,6 +57,7 @@ func FetchAccessToken() (string, error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
+		println(err)
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
@@ -129,6 +131,7 @@ func postCourseData(course CourseData) {
 	//recupera dados via variavel de ambiente
 	token, err := FetchAccessToken()
 	if err != nil {
+		println("Error fetching access token:", err)
 		log.Println("Error fetching access token:", err)
 		return
 	}
@@ -136,12 +139,14 @@ func postCourseData(course CourseData) {
 
 	jsonData, err := json.Marshal(course)
 	if err != nil {
+		println("Error encoding course data:", err)
 		log.Println("Error encoding course data:", err)
 		return
 	}
 
 	req, err := http.NewRequest("POST", apiUrl, bytes.NewBuffer(jsonData))
 	if err != nil {
+		println("Error creating request:", err)
 		log.Println("Error creating request:", err)
 		return
 	}
@@ -164,7 +169,7 @@ func postCourseData(course CourseData) {
 		log.Println("Error reading response body:", err)
 		return
 	}
-
+	println("Curso: " + course.Title + " - Response from API: " + string(body))
 	log.Printf("Curso: %s: Response from API: %s", course.Title, string(body))
 }
 
