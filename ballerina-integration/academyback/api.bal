@@ -15,6 +15,14 @@ type Course record {|
     string image_url;
 |};
 
+type TotalReview record {
+    int totalReviews;
+};
+
+type TotalStudents record {
+    int totalStudents;
+};
+
 configurable string dbUser = os:getEnv("DB_USER");
 configurable string dbPassword = os:getEnv("DB_PASSWORD");
 configurable string dbHost = os:getEnv("DB_HOSTNAME");
@@ -50,25 +58,40 @@ service /curso on new http:Listener(9090) {
             select course;
     }
 
-    resource function get totalStudents() returns int|http:NotFound|error{
+    resource function get totalStudents() returns TotalStudents|http:NotFound|error{
+        TotalStudents total = {
+            totalStudents: 0
+        };
         int|sql:Error result = self.db->queryRow(`select sum(num_students) as sum from course_data`);
         // Check if record is available or not
         if result is sql:NoRowsError {
             return http:NOT_FOUND;
-        } else {
+        } else if result is int{
+            total.totalStudents = result;
+            return total;
+        }else {
             return result;
         }
         
     }
 
-    resource function get totalReviews() returns int|http:NotFound|error{
+    resource function get totalReviews() returns TotalReview|http:NotFound|error{
+        TotalReview total = {
+            totalReviews: 0
+        };
+        
         int|sql:Error result = self.db->queryRow(`select sum(num_reviews) as sum from course_data`);
+        
         // Check if record is available or not
         if result is sql:NoRowsError {
             return http:NOT_FOUND;
-        } else {
+        } else if result is int {
+            total.totalReviews = result;
+            return total;
+        }else{
             return result;
         }
         
     }
+    
 }
