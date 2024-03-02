@@ -49,4 +49,15 @@ service /curso on new http:Listener(9090) {
         return from Course course in resultStream
             select course;
     }
+
+    resource function get totalStudents() returns int|http:NotFound|error{
+        int|sql:Error result = self.db->queryRow(`select sum(num_students) as sum from course_data`);
+        // Check if record is available or not
+        if result is sql:NoRowsError {
+            return http:NOT_FOUND;
+        } else {
+            return result;
+        }
+        
+    }
 }
