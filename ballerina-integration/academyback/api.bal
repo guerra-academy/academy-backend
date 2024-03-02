@@ -2,14 +2,15 @@ import ballerina/http;
 import ballerina/os;
 import ballerinax/postgresql;
 import ballerinax/postgresql.driver as _;
+import ballerina/sql;
 
 type Course record {|
     int course_id;
     string title;
-    float rating;
+    decimal rating;
     int num_reviews;
     int num_students;
-    float hours;
+    decimal hours;
     string discount_url;
     string image_url;
 |};
@@ -40,5 +41,12 @@ service /curso on new http:Listener(9090) {
             image_url = EXCLUDED.image_url;
         `);
         return course;
+    }
+    resource function get .() returns Course[]|error {
+        // Executar a consulta SQL
+        //selecionar apenas campos do type Course no select abaixo        
+        stream<Course, sql:Error?> resultStream = self.db->query(`SELECT course_id, title, rating, num_reviews, num_students, hours, discount_url, image_url FROM course_data`);
+        return from Course course in resultStream
+            select course;
     }
 }
