@@ -60,4 +60,15 @@ service /curso on new http:Listener(9090) {
         }
         
     }
+
+    resource function get totalReviews() returns int|http:NotFound|error{
+        int|sql:Error result = self.db->queryRow(`select sum(num_reviews) as sum from course_data`);
+        // Check if record is available or not
+        if result is sql:NoRowsError {
+            return http:NOT_FOUND;
+        } else {
+            return result;
+        }
+        
+    }
 }
