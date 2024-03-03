@@ -22,3 +22,4 @@ go.work
 *.sh
 *old
 *log
+.DS_Store
