@@ -69,10 +69,10 @@ service /curso on new http:Listener(9090) {
             return http:NOT_FOUND;
         } else if result is int{
             total.totalStudents = result;
-            io:println("result: ",result);
+            io:println("result total students: ",result);
             return total;
         }else {
-            io:println("result: ",result);
+            io:println("result total students: ",result);
             return result;
         }
         
@@ -87,11 +87,14 @@ service /curso on new http:Listener(9090) {
         
         // Check if record is available or not
         if result is sql:NoRowsError {
+            io:println("not found sql error total reviews: ",result);
             return http:NOT_FOUND;
         } else if result is int {
             total.totalReviews = result;
+            io:println("result total reviews: ",result);
             return total;
         }else{
+            io:println("result total reviews: ",result);
             return result;
         }
         
