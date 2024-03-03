@@ -3,7 +3,8 @@ import ballerina/os;
 import ballerinax/postgresql;
 import ballerinax/postgresql.driver as _;
 import ballerina/sql;
-
+import ballerina/log;
+import ballerina/io;
 type Course record {|
     int course_id;
     string title;
@@ -63,13 +64,16 @@ service /curso on new http:Listener(9090) {
             totalStudents: 0
         };
         int|sql:Error result = self.db->queryRow(`select sum(num_students) as sum from course_data`);
+        
         // Check if record is available or not
         if result is sql:NoRowsError {
             return http:NOT_FOUND;
         } else if result is int{
             total.totalStudents = result;
+            io:println("result: ",result);
             return total;
         }else {
+            io:println("result: ",result);
             return result;
         }
         
