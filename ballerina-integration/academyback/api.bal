@@ -3,7 +3,6 @@ import ballerina/os;
 import ballerinax/postgresql;
 import ballerinax/postgresql.driver as _;
 import ballerina/sql;
-import ballerina/log;
 import ballerina/io;
 type Course record {|
     int course_id;
