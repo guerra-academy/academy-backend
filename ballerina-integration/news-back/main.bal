@@ -21,14 +21,6 @@ configurable string dbHost = os:getEnv("DB_HOSTNAME");
 configurable string dbName = os:getEnv("DB_NAME");
 int dbPort = 5432;
 
-@http:ServiceConfig {
-    cors: {
-        allowOrigins: ["*"],
-        allowCredentials: false,
-        allowHeaders: ["authorization", "Content-Type", "Access-Control-Allow-Origin", "apikey", "API-Key"],
-        maxAge: 84900
-    }
-}
 service /users on new http:Listener(9090) {
     private final postgresql:Client db;
     function init() returns error? {
