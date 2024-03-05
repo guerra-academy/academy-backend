@@ -35,11 +35,6 @@ service /users on new http:Listener(9090) {
         self.db = check new (host = dbHost, username = dbUser, password = dbPassword, database = dbName, port = dbPort, connectionPool = {maxOpenConnections: 1});
     }
 
-    // Manipulador para solicitações OPTIONS
-    resource function options .() returns boolean{
-        return true;
-    }
-
     resource function get .() returns User[]|error {
         // Executar a consulta SQL
         //selecionar apenas campos do type Course no select abaixo        
