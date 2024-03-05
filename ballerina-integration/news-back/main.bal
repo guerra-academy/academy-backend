@@ -3,6 +3,7 @@ import ballerina/os;
 import ballerinax/postgresql;
 import ballerinax/postgresql.driver as _;
 import ballerina/sql;
+import ballerina/log;
 
 type User record {|
     int id;
@@ -24,6 +25,22 @@ service /users on new http:Listener(9090) {
     private final postgresql:Client db;
     function init() returns error? {
         self.db = check new (host = dbHost, username = dbUser, password = dbPassword, database = dbName, port = dbPort, connectionPool = {maxOpenConnections: 1});
+    }
+
+    // Manipulador para solicitações OPTIONS
+    resource function options .(http:Caller caller, http:Request req) {
+        http:Response res = new;
+        
+        // Definir cabeçalhos CORS necessários
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Ajuste conforme necessário
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+        
+        // Enviar a resposta para a solicitação OPTIONS
+        var result = caller->respond(res);
+        if (result is error) {
+            log:printError("Error sending response", result);
+        }
     }
 
     resource function get .() returns User[]|error {
