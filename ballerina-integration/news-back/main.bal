@@ -3,7 +3,6 @@ import ballerina/os;
 import ballerinax/postgresql;
 import ballerinax/postgresql.driver as _;
 import ballerina/sql;
-import ballerina/log;
 
 type User record {|
     int id;
@@ -21,6 +20,15 @@ configurable string dbPassword = os:getEnv("DB_PASSWORD");
 configurable string dbHost = os:getEnv("DB_HOSTNAME");
 configurable string dbName = os:getEnv("DB_NAME");
 int dbPort = 5432;
+
+@http:ServiceConfig {
+    cors: {
+        allowOrigins: ["*"],
+        allowCredentials: false,
+        allowHeaders: ["authorization", "Content-Type", "Access-Control-Allow-Origin", "apikey", "API-Key"],
+        maxAge: 84900
+    }
+}
 service /users on new http:Listener(9090) {
     private final postgresql:Client db;
     function init() returns error? {
@@ -28,19 +36,8 @@ service /users on new http:Listener(9090) {
     }
 
     // Manipulador para solicitações OPTIONS
-    resource function options .(http:Caller caller, http:Request req) {
-        http:Response res = new;
-        
-        // Definir cabeçalhos CORS necessários
-        res.setHeader("Access-Control-Allow-Origin", "*"); // Ajuste conforme necessário
-        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-        
-        // Enviar a resposta para a solicitação OPTIONS
-        var result = caller->respond(res);
-        if (result is error) {
-            log:printError("Error sending response", result);
-        }
+    resource function options .() returns boolean{
+        return true;
     }
 
     resource function get .() returns User[]|error {
