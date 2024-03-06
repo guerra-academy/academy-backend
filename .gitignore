@@ -23,3 +23,4 @@ go.work
 *old
 *log
 .DS_Store
+*env

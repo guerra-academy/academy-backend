@@ -1,6 +1,6 @@
 [package]
 org = "glaucioguerra"
-name = "news_back"
+name = "news_back_ballerina"
 version = "0.1.0"
 distribution = "2201.8.5"
 
