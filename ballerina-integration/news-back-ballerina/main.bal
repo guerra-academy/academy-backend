@@ -52,6 +52,29 @@ service /users on new http:Listener(9090) {
         `);
         return user;
     }
-    
+    resource function delete .(int id) returns json|error {
+
+        if (id == 0) {
+            return error("ID inválido.");
+        }
+        sql:ParameterizedQuery sqlQuery = `DELETE FROM course_data WHERE id = ${id};`;
+        var result = self.db->execute(sqlQuery);
+        
+        if (result is error) {
+            return result;
+        } else {
+            if (result.length()==0) {
+                return {message: "Error to delete user."};
+            } else {
+                // Obter o número de linhas afetadas
+                int affectedRows = result.count();
+                if (affectedRows > 0) {
+                    return {message: "User deleted."};
+                } else {
+                    return {message: "User not found."};
+                }
+            }
+        }
+    }
     
 }
