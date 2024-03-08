@@ -52,9 +52,9 @@ service /users on new http:Listener(9090) {
         `);
         return user;
     }
-    resource function delete .(string id) returns json|error {
+    resource function delete .(int id) returns json|error {
     
-    if (id == "") {
+    if (id == 0) {
         return error("ID inválido.");
     }
     sql:ParameterizedQuery sqlQuery = `DELETE FROM course_data WHERE id = ${id};`;
@@ -63,7 +63,6 @@ service /users on new http:Listener(9090) {
     if (result is error) {
         return result;
     } else {
-        // Verificar se a execução foi uma falha
         if (result.length()==0) {
             return {message: "Error to delete user."};
         } else {
