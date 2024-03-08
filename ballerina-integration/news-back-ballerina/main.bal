@@ -71,7 +71,7 @@ service /users on new http:Listener(9090) {
             if (affectedRows > 0) {
                 return {message: "User deleted."};
             } else {
-                return {message: "No user found."};
+                return {message: "User not found."};
             }
         }
     }
