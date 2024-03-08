@@ -36,7 +36,7 @@ service /users on new http:Listener(9090) {
     }
     resource function post .(User user) returns User|error {
         _ = check self.db->execute(`
-            INSERT INTO course_data (id, nome, email, subscribed, data_hora, recaptcha, cod_rec, gerou_cert)
+            INSERT INTO usuarios (id, nome, email, subscribed, data_hora, recaptcha, cod_rec, gerou_cert)
             VALUES (${user.id}, ${user.nome}, ${user.email}, ${user.subscribed}, ${user.data_hora}, ${user.recaptcha}, ${user.cod_rec}, ${user.gerou_cert})
             ON CONFLICT (email)
             DO UPDATE SET
@@ -57,7 +57,7 @@ service /users on new http:Listener(9090) {
         if (id == 0) {
             return error("ID inválido.");
         }
-        sql:ParameterizedQuery sqlQuery = `DELETE FROM course_data WHERE id = ${id};`;
+        sql:ParameterizedQuery sqlQuery = `DELETE FROM usuarios WHERE id = ${id};`;
         var result = self.db->execute(sqlQuery);
         
         if (result is error) {
