@@ -4,6 +4,7 @@ import ballerinax/postgresql;
 import ballerinax/postgresql.driver as _;
 import ballerina/sql;
 import ballerina/io;
+
 type Course record {|
     int course_id;
     string title;
@@ -13,6 +14,11 @@ type Course record {|
     decimal hours;
     string discount_url;
     string image_url;
+|};
+
+type Newsletter record {|
+    string name;
+    string email;
 |};
 
 type TotalReview record {
@@ -27,13 +33,21 @@ configurable string dbUser = os:getEnv("DB_USER");
 configurable string dbPassword = os:getEnv("DB_PASSWORD");
 configurable string dbHost = os:getEnv("DB_HOSTNAME");
 configurable string dbName = os:getEnv("DB_NAME");
-int dbPort = 5432;
+configurable string dbPort = os:getEnv("DB_PORT");
 service /curso on new http:Listener(9090) {
     private final postgresql:Client db;
     function init() returns error? {
-        self.db = check new (host = dbHost, username = dbUser, password = dbPassword, database = dbName, port = dbPort, connectionPool = {maxOpenConnections: 1});
-    }
+        var intPort = int:fromString(dbPort); 
+        if intPort is int{
+            self.db = check new (host = dbHost, username = dbUser, password = dbPassword, database = dbName, port = intPort, connectionPool = {maxOpenConnections: 1});
+        }else{
+            io:println("error: " + intPort.message());
+            return intPort;
 
+        }
+        
+    }
+    
     resource function post .(Course course) returns Course|error {
         _ = check self.db->execute(`
             INSERT INTO course_data (course_id, title, rating, num_reviews, num_students, hours, discount_url, image_url)
@@ -57,6 +71,7 @@ service /curso on new http:Listener(9090) {
         return from Course course in resultStream
             select course;
     }
+
 
     resource function get totalStudents() returns TotalStudents|http:NotFound|error{
         TotalStudents total = {
