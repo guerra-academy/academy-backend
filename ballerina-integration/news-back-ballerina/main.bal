@@ -3,6 +3,7 @@ import ballerina/os;
 import ballerinax/postgresql;
 import ballerinax/postgresql.driver as _;
 import ballerina/sql;
+import ballerina/io;
 
 type User record {|
     int id;
@@ -19,17 +20,22 @@ configurable string dbUser = os:getEnv("DB_USER");
 configurable string dbPassword = os:getEnv("DB_PASSWORD");
 configurable string dbHost = os:getEnv("DB_HOSTNAME");
 configurable string dbName = os:getEnv("DB_NAME");
-int dbPort = 5432;
+configurable string dbPort = os:getEnv("DB_PORT");
 
 service /users on new http:Listener(9090) {
     private final postgresql:Client db;
     function init() returns error? {
-        self.db = check new (host = dbHost, username = dbUser, password = dbPassword, database = dbName, port = dbPort, connectionPool = {maxOpenConnections: 1});
+        var intPort = int:fromString(dbPort); 
+        if intPort is int{
+            self.db = check new (host = dbHost, username = dbUser, password = dbPassword, database = dbName, port = intPort, connectionPool = {maxOpenConnections: 1});
+        }else{
+            io:println("error: " + intPort.message());
+            return intPort;
+
+        }
     }
 
     resource function get .() returns User[]|error {
-        // Executar a consulta SQL
-        //selecionar apenas campos do type Course no select abaixo        
         stream<User, sql:Error?> resultStream = self.db->query(`SELECT id, nome, email, subscribed, data_hora, recaptcha, cod_rec, gerou_cert FROM usuarios`);
         return from User user in resultStream
             select user;
