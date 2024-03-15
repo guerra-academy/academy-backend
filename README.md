@@ -25,4 +25,3 @@ API REST escrita em Ballerina para administrar usuários da Newsletter. Usuário
 # load-courses:  Scheduler 
 
 Aplicação load-courses consulta dados dos cursos na plataforma da Udemy. Após recuperar esses dados, eles devem ser armazenados no banco de dados PostgreSQL. Esse armazenamento é feito utilizando a api academy-backend, que disponibiliza uma api REST para cadastrar cursos. Essa API é protegida via Asgardeo com OAuth2, onde é feita a chamada de recuperação de token JWT para efetuar as chamadas de forma segura para a API.
-
